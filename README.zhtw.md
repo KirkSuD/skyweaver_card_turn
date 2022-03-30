@@ -7,7 +7,7 @@
 使用者腳本版本只支援**Firefox**。  
 瀏覽器外掛版本支援主流瀏覽器，包括**Chrome, Edge, Firefox**...
 
-[//]: # (![截圖](https://i.imgur.com/xg6Gq0D.png))
+<!-- (![截圖](https://i.imgur.com/xg6Gq0D.png)) -->
 ![截圖](https://i.imgur.com/Y48UsBB.png)
 
 ## 功能
@@ -16,7 +16,7 @@
 - 以底線標記不是選牌/牌組/手牌來源的特殊卡牌
 - 可拖曳的顯示方塊
 - 儲存狀態在瀏覽器 localStorage，所以可以在您的回合重整網頁
-- 未來有可能新增更多功能。您可以贊助我！
+- 未來有可能新增更多功能。您可以贊助來激勵我！
 
 ## 安裝
 
@@ -24,7 +24,7 @@
 
 還沒有上架 Chrome/Firefox 的外掛商店，請下載安裝。
 
-1. 下載 release/browser_extension_版本.zip
+1. 下載 [最新的 release/browser_extension_版本.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.03.26.09.zip)
 2. 解壓 zip 到資料夾
 3. 根據瀏覽器，繼續以下操作
 

@@ -7,7 +7,7 @@ This is still in **Alpha** stage. There's absolutely no warranty.
 Userscript only supports **Firefox**.  
 Browser extension supports **major browsers**, including **Chrome, Edge, Firefox**...
 
-[//]: # (![Screenshot](https://i.imgur.com/xg6Gq0D.png))
+<!-- (![Screenshot](https://i.imgur.com/xg6Gq0D.png)) -->
 ![Screenshot](https://i.imgur.com/Y48UsBB.png)
 
 ## Features
@@ -24,7 +24,7 @@ Browser extension supports **major browsers**, including **Chrome, Edge, Firefox
 
 The extension is not on Chrome/Firefox add-on store yet.
 
-1. Download release/browser_extension_VERSION.zip
+1. Download [latest release/browser_extension_VERSION.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.03.26.09.zip)
 2. Extract the zip file to a folder
 3. Follow browser-specific steps below
 
