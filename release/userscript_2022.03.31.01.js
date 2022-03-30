@@ -1,125 +1,27 @@
 // ==UserScript==
 // @name        Skyweaver opponent card draw turn memorizer
 // @namespace   https://github.com/KirkSuD
-// @version     2022.03.26.09
+// @version     2022.03.31.01
 // @description This script remembers which turn the opponent drew the cards by replacing/patching JS.
 // @match       https://play.skyweaver.net/game/*
+// @icon        https://play.skyweaver.net/images/favicon/favicon-32x32.png
 // @author      KirkSuD
 // @grant       GM.xmlHttpRequest
 // @run-at      document-start
 // ==/UserScript==
 
-/*
-# Skyweaver opponent card draw turn memorizer userscript
+// [Github: KirkSuD/skyweaver_card_turn](https://github.com/KirkSuD/skyweaver_card_turn)
 
-This script remembers which turn the opponent drew the cards by replacing/patching JS.  
-This script is still in **Alpha** stage, and only supports **Firefox**.  
-A browser extension which supports **Chrome** is done, stay tuned for the release.
+(async function() {
+'use strict';
 
-[//]: # (![Screenshot](https://i.imgur.com/xg6Gq0D.png))
-![Screenshot](https://i.imgur.com/Y48UsBB.png)
+try {
 
-## Features
-
-- Remember which turn the opponent drew the cards  
-- Mark "gift cards" with an underline (cards not from CardSelection/Deck/Hand)  
-- Draggable beautiful UI box  
-- Save state in localStorage, so you can resume after refreshing the page  
-- More features may or may not come in the future. Donate to motivate me!
-
-## Restrictions
-
-Only works on **Firefox** because not able to intercept body script on Chromium.  
-Tested on GreaseMonkey & TamperMonkey.  
-May not work on newer version of Skyweaver.  
-When they update the code, rewriting code might be necessary
-    because this script works by patching their code.
-
-## Troubleshooting
-
-To view the output of this script, search "Skyweaver card turn" in the developer tool's console.  
-To help debugging, when you find something wrong,  
-    open browser developer tool by pressing F12 right after the game,
-    type "JSON.stringify(window.skyweaverWorkerProxyStoreEvents)",  
-    then right click the output json message,
-    click "copy object", save it as a text file,
-    which contains all game events, useful for debugging.
-
-## Disclaimer
-
-This is software with absolutely no warranty.  
-    Please disable this userscript and reload web page if you find something wrong.
-
-## Changelog
-
-### 2022.03.24.09
-
-First version.
-This would patch https://play.skyweaver.net/game/fbc69ea5693e28c1a859bc8f7bdaa9eeb88d958e/main-fea492886614074130ff.js
-
-### 2022.03.25.16
-
-Hot fix.
-This would patch https://play.skyweaver.net/game/6e90311d3ead8634147fb04d62ca9a7c3c671ab1/main-0855b4c75acf85cb7f03.js  
-Newer version may come in the form of browser extension in order to support Chrome.
-
-### 2022.03.26.05
-
-Regex matching "https://play.skyweaver.net/game/* /main-*.js" to patch  
-Mark "gift cards" with an underline  
-Draggable beautiful UI box  
-Save & load state in localStorage  
-Browser extension which supports Firefox & Chromium is done! Stay tuned.
-
-## Donation
-
-Winning using this userscript? Consider buying me a coffee!  
-My crypto addresses:
-```
-BTC   bc1qttretrlxjfv2363zdg7xvthyvrstsru0mhangk  
-ETH   0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-BNB   bnb1pqzkpxl5s5wc3s7h2hga5hq8sn98sz4a0xefec  
-LUNA  terra1upxh8ufp3carg8z8nc39sdrsrn02cde8hxxlz9  
-SOL   2V9Ux48XttpH3r4ZTg3rxRpd5fmLiYz2EAq2eCSNifCY  
-DOT   14j8gPesPyxmw4eC1rBpUqgydT3xw7KJSo2dJ6VuigG9J4E9  
-AVAX  0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-DOGE  DA19CxjfTkURNVxs5fNeZGNdsUPsStax5E  
-MATIC 0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-LTC   ltc1qlgqh5aqemjazsfnq7zxayg6y75aqv7twl2r56d  
-ATOM  cosmos1gaqjnqrz9aae2w03dw3zr3xr8un2tnpnv075rf  
-FTT   0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-THETA 0xa3415F2e117A256c3371B7ee4a6340862A1294E9  
-GRT   0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-CAKE  0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-DASH  XgrxBD5KWjnYaScpNd6u4fGxiYfc9u2uBN  
-DGB   dgb1q65h5v9990mrx2eutyu4xud23qlty6e5u66xzv9  
-XNO   nano_1m5kn3h34gibzoz54g9yie5je5c6psiofiwr4tcx3um8up3abaz31z33tqo4  
-TT    0x08AF0f949a8Af3027177C8b42B91d85f951a487B  
-LBC   bZqCwFPuGDaQfH5W1QYy19Fs4uGF83UvgC
-```
-*/
-
-console.log("Skyweaver card turn: Skyweaver opponent Skyweaver card turn start.");
-
-function addScript(text) {
-    const newScript = document.createElement('script');
-    newScript.textContent = text;
-    document.getElementsByTagName('head')[0].appendChild(newScript);
-}
+console.log("Skyweaver card turn:", "start");
 
 function cardTurnSubscriber(v) {
-    let turn = 0, hand = [], handFromLocation=[],
-        target = null, cardTurnDisplayText = null, noerror=true;
-    // function getGameId() {
-    //     const p = location.pathname;
-    //     if (p.match(/^\/game\/([a-f0-9]){40}\/$/g)) {
-    //         return location.pathname.slice(6, -1);
-    //     }
-    //     else {
-    //         return null;
-    //     }
-    // }
-    // const gameId = getGameId();
+    let turn = 0, hand = [], handFromLocation = [], displayTextPos = ["180px", "10%"],
+        target = null, cardTurnDisplayText = null, noerror = true;
     const localStorageKey = "skyweaver_card_turn_addon_saved_hand";
     let savedHand;
     try {
@@ -127,11 +29,16 @@ function cardTurnSubscriber(v) {
     } catch (error) {
         savedHand = null;
     }
-    if (savedHand) { //gameId && savedHand && gameId == savedHand.gameId) {
+    if (savedHand && "turn hand handFromLocation displayTextPos".split(" ").every(k => k in savedHand)) {
         console.log("Skyweaver card turn:", "load state from localStorage:", savedHand);
-        ({turn, hand, handFromLocation} = savedHand);
+        ({turn, hand, handFromLocation, displayTextPos} = savedHand);
     }
     return function(ev) {
+        function saveLocalStorage() {
+            localStorage.setItem(localStorageKey, JSON.stringify({
+                turn, hand, handFromLocation, displayTextPos
+            }));
+        }
         function draggable(elem) {
             let x, y;
             elem.onmousedown = function(e) {
@@ -154,6 +61,8 @@ function cardTurnSubscriber(v) {
                     // console.log("Skyweaver card turn:", "mouse up");
                     document.onmousemove = null;
                     document.onmouseup = null;
+                    displayTextPos = [elem.style.left, elem.style.top];
+                    saveLocalStorage();
                 };
             };
         }
@@ -205,9 +114,7 @@ function cardTurnSubscriber(v) {
                 hand.push(turn);
                 handFromLocation.push(from_location);
             }
-            localStorage.setItem(localStorageKey, JSON.stringify({
-                turn, hand, handFromLocation
-            }));
+            saveLocalStorage();
 
             if (cardTurnDisplayText == null) {
                 console.log("Skyweaver card turn: create display text")
@@ -222,8 +129,8 @@ function cardTurnSubscriber(v) {
                     #cardTurnDisplayText {
                         position: absolute;
                         /* right: 8px; */
-                        left: 180px;
-                        top: 10%;
+                        left: ${displayTextPos[0]};
+                        top: ${displayTextPos[1]};
                         width: 204px;
                         height: 50px;
                         color: white;
@@ -258,15 +165,15 @@ function cardTurnSubscriber(v) {
         catch (error) {
             console.log("Skyweaver card turn:", "cardTurnSubscriber error:", error);
             alert(
-                "Skyweaver card turn extension: error occurred when processing event!" +
-                "Disable extension and notify developer if this happened multiple times." +
+                "Skyweaver card turn extension: error occurred when processing event!\n" +
+                "Disable extension and notify developer if this happened multiple times.\n" +
                 "Error detail: " + error
             );
             noerror = false;
         }
     }
 }
-function startCardTurnCounter(originalJS) {
+function patchScript(originalJS) {
     const insertPoint = originalJS.indexOf("function cardEntityOwner(e){return");
     const insertCode = `
         try {
@@ -275,33 +182,73 @@ function startCardTurnCounter(originalJS) {
         catch (error) {
             console.log("Skyweaver card turn:", "subscribeToCardEvents error:", error);
             alert(
-                "Skyweaver card turn extension: error occurred when subscribing event!" +
-                "Disable extension and notify developer if this happened multiple times." +
+                "Skyweaver card turn extension: error occurred when subscribing event!\\n" +
+                "Disable extension and notify developer if this happened multiple times.\\n" +
                 "Error detail: " + error
             );
         }
         console.log("Skyweaver card turn:", "subscribeToCardEvents", "finish");
     `;
-    const newJS = originalJS.slice(0, insertPoint) + insertCode + originalJS.slice(insertPoint);
-    addScript(newJS);
-    console.log("Skyweaver card turn: patched script.");
+    return originalJS.slice(0, insertPoint) + insertCode + originalJS.slice(insertPoint);
 }
 
-window.addEventListener('beforescriptexecute', function(e) {
-    const src = e.target.src;
-    console.log("Skyweaver card turn: detect script:", src);
-    // if (src === "https://play.skyweaver.net/game/fbc69ea5693e28c1a859bc8f7bdaa9eeb88d958e/main-fea492886614074130ff.js") {
-    // if (src === "https://play.skyweaver.net/game/6e90311d3ead8634147fb04d62ca9a7c3c671ab1/main-0855b4c75acf85cb7f03.js") {
-    if (src.match(/^https:\/\/play\.skyweaver\.net\/game\/([a-f0-9]){40}\/main-([a-f0-9]){20}.js$/g)) {
-        console.log("Skyweaver card turn: patching script.");
-        e.preventDefault();
-        e.stopPropagation();
-        GM.xmlHttpRequest({
-            method: "GET",
-            url: e.target.src,
-            onload: function(response) {
-                startCardTurnCounter(response.responseText);
-            }
-        });
+function addScript(text) {
+    const newScript = document.createElement('script');
+    newScript.textContent = text;
+    document.getElementsByTagName("body")[0].appendChild(newScript);
+}
+
+// if there's registered service worker, unregister & refresh
+//   because Chrome service worker would cache script
+const registrations = await navigator.serviceWorker.getRegistrations();
+if (registrations.length > 0) {
+    for(let registration of registrations) {
+        console.log("Skyweaver card turn:", "remove service worker:", registration);
+        registration.unregister();
+    }
+    location.reload(true);
+    return;
+}
+
+window.addEventListener("load", function() {
+    for (const elem of document.getElementsByTagName("script")) {
+        const src = elem.getAttribute("src");
+        // https:\/\/play\.skyweaver\.net
+        const toMatch = /^\/game\/([a-f0-9]){40}\/main-([a-f0-9]){20}.js$/g;
+        console.log("Skyweaver card turn:", "found script:", src);
+        if (src && src.match(toMatch)) {
+            console.log("Skyweaver card turn:", "fetch script:", src);
+            fetch("https://play.skyweaver.net"+src).then(response => {
+                console.log("Skyweaver card turn:", "got response.");
+                return response.text();
+            }).then(text => {
+                console.log("Skyweaver card turn:", "patching script...");
+                text = patchScript(text);
+                // text = "alert('success!');"
+                addScript(text);
+                console.log("Skyweaver card turn:", "patched script.");
+            }).catch(function(err) {console.log("Skyweaver card turn:", "error:", err);})
+            ;
+        }
     }
 });
+
+window.addEventListener('beforescriptexecute', function(e) {
+    // only firefox would trigger beforescriptexecute
+    const src = e.target.src;
+    console.log("Skyweaver card turn: detect script:", src);
+    if (src.match(/^https:\/\/play\.skyweaver\.net\/game\/([a-f0-9]){40}\/main-([a-f0-9]){20}.js$/g)) {
+        console.log("Skyweaver card turn: block script:", src);
+        e.preventDefault();
+        e.stopPropagation();
+    }
+});
+
+console.log("Skyweaver card turn:", "finish");
+
+}
+catch (error) {
+    console.log("Skyweaver card turn:", "error:", error);
+}
+
+})();

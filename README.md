@@ -24,7 +24,7 @@ Browser extension supports **major browsers**, including **Chrome, Edge, Firefox
 
 The extension is not on Chrome/Firefox add-on store yet.
 
-1. Download [latest release/browser_extension_VERSION.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.03.26.09.zip)
+1. Download [latest release/browser_extension_VERSION.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.03.31.01.zip)
 2. Extract the zip file to a folder
 3. Follow browser-specific steps below
 
@@ -35,14 +35,14 @@ The extension is not on Chrome/Firefox add-on store yet.
 3. Click `Load unpacked`
 4. Select the unzipped folder
 5. Make sure the extension is enabled & permissions are given
-6. The extension should be working. If not, try clearing the browser cache
+6. The extension should be working. If not, try refreshing the webpage & clearing the browser cache
 
 #### Firefox
 
 1. Goto [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox)
 2. Click `Load Temporary Add-on`
 3. Select the zip file or the unzipped `manifest.json`
-4. The extension should be working. If not, try clearing the browser cache
+4. The extension should be working. If not, try refreshing the webpage & clearing the browser cache
 
 ### Userscript
 
@@ -98,6 +98,13 @@ Mark "gift cards" with an underline
 Draggable beautiful UI box  
 Save & load state in localStorage  
 Browser extension which supports Firefox & Chromium is done! Stay tuned.
+
+### 2022.03.31.01
+
+Modify browser extension structure to fix the background to content communication bug.  
+    Now Chrome background script blocks script, Chrome content script patches script.  
+    Now Firefox background script does nothing, Firefox content script blocks & patches script.  
+Now content script is also userscript.
 
 ## Donation
 

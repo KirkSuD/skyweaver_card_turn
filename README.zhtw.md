@@ -24,7 +24,7 @@
 
 還沒有上架 Chrome/Firefox 的外掛商店，請下載安裝。
 
-1. 下載 [最新的 release/browser_extension_版本.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.03.26.09.zip)
+1. 下載 [最新的 release/browser_extension_版本.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.03.31.01.zip)
 2. 解壓 zip 到資料夾
 3. 根據瀏覽器，繼續以下操作
 
@@ -35,14 +35,14 @@
 3. 點選 `載入未封裝項目`
 4. 選擇剛剛解壓縮的資料夾
 5. 確認外掛已啟用，且權限已授予
-6. 外掛應該已經正常運作。如果有問題，嘗試清除瀏覽器快取
+6. 外掛應該已經正常運作。如果有問題，嘗試重整頁面和清除瀏覽器快取
 
 #### Firefox
 
 1. 前往 [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox)
 2. 點選 `載入暫用附加元件...`
 3. 選擇 zip 或 解壓後的 `manifest.json`
-4. 外掛應該已經正常運作。如果有問題，嘗試清除瀏覽器快取
+4. 外掛應該已經正常運作。如果有問題，嘗試重整頁面和清除瀏覽器快取
 
 ### 使用者腳本
 
@@ -94,6 +94,12 @@
 可拖曳的顯示方塊  
 儲存狀態在瀏覽器 localStorage，所以可以在您的回合重整網頁  
 支援主流瀏覽器的瀏覽器外掛已完成！敬請期待
+
+### 2022.03.31.01
+
+修改瀏覽器外掛結構以修正背景腳本與內容腳本的通訊問題。  
+現在Chrome的背景腳本負責阻擋原腳本，內容腳本則負責修改腳本。  
+Firefox的背景腳本無作用，內容腳本會阻擋原腳本及修改腳本，內容腳本同時也是使用者腳本。
 
 ## 贊助
 
