@@ -1,0 +1,28 @@
+{
+    "manifest_version": 2,
+    "version": "2022.03.26.09",
+    "name": "Skyweaver Card Draw Turn Memorizer",
+    "description": "This remembers which turn the opponent drew the cards by replacing/patching JS",
+
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "96": "icons/icon96.png",
+        "128": "icons/icon128.png"
+    },
+    "permissions": [
+        "https://play.skyweaver.net/game/*",
+        "webRequest",
+        "webRequestBlocking"
+    ],
+    "background": {
+        "scripts": ["background_script.js"]
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://play.skyweaver.net/game/*"],
+            "run_at": "document_start",
+            "js": ["content_script.js"]
+        }
+    ]
+}

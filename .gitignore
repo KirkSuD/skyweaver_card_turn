@@ -1,0 +1,15 @@
+*
+
+!browser_extension/
+!browser_extension/*
+!browser_extension/icons/
+!browser_extension/icons/*
+
+!release/
+!release/*
+
+!.gitignore
+!README.md
+!README.zhtw.md
+!userscript.js
+!icon.svg
