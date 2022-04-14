@@ -7,16 +7,29 @@
 使用者腳本版本只支援**Firefox**。  
 瀏覽器外掛版本支援主流瀏覽器，包括**Chrome, Edge, Firefox**...
 
-<!-- (![截圖](https://i.imgur.com/xg6Gq0D.png)) -->
-![截圖](https://i.imgur.com/Y48UsBB.png)
+<!-- ![截圖](https://i.imgur.com/xg6Gq0D.png) -->
+<!-- ![截圖](https://i.imgur.com/Y48UsBB.png) -->
+[![截圖](https://i.imgur.com/OPiGp3A.png)](https://i.imgur.com/39WCBEW.mp4)
+[![截圖](https://i.imgur.com/443bnNP.png)](https://i.imgur.com/39WCBEW.mp4)
+<!-- https://imgur.com/a/PfjH1bT -->
 
 ## 功能
 
-- 顯示對手獲取手牌的回合數
-- 以底線標記不是選牌/牌組/手牌來源的特殊卡牌
+- 顯示對手拿到牌的資訊，包括...  
+    - 在哪一方的回合拿到的
+    - 在哪一回合 (數字)
+    - 從哪裡: Deck, Limbo...
+    - 動作: StartTurn, EndTurn, PlayCard, Attack...
+    - 卡牌池: Anywhere, Prisms...
+    - mulligan: 多少張卡
+    - fatigue (基本上就代表 conjure)
+    - 打出的牌 & 牌的指定目標
+    - 攻擊 & 被攻擊的
+    - 觸發的卡 & 觸發類型
+- 以底線標記特殊卡牌 (不是選卡或回合開始抽來的)  
+- 檢視對手的和你的不在場上/手上/牌組/墳墓的英雄相應Prism卡牌
 - 可拖曳的顯示方塊
 - 儲存狀態在瀏覽器 localStorage，所以可以在您的回合重整網頁
-- 未來有可能新增更多功能。您可以贊助來激勵我！
 
 ## 安裝
 
@@ -24,7 +37,7 @@
 
 還沒有上架 Chrome/Firefox 的外掛商店，請下載安裝。
 
-1. 下載 [最新的 release/browser_extension_版本.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.03.31.01.zip)
+1. 下載 [最新的 release/browser_extension_版本.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.04.14.10.zip)
 2. 解壓 zip 到資料夾
 3. 根據瀏覽器，繼續以下操作
 
@@ -54,6 +67,10 @@
 
 可能無法在新版的 Skyweaver 運作。  
 當他們更新網頁程式，這個專案的程式碼可能得重寫。
+
+研究過後可以確定，幾乎不可能做出沒有錯誤的計牌器，因為無法理解卡牌作用並進行模擬，  
+詳細卡牌互動看起來是在Skyweaver後端進行的。如「3095死聲>抽出3097死聲>抽牌」，  
+第2個死聲不會在前端資料中顯示出來，只有人直接看才知道。
 
 ### 使用者腳本
 
@@ -101,29 +118,31 @@
 現在Chrome的背景腳本負責阻擋原腳本，內容腳本則負責修改腳本。  
 Firefox的背景腳本無作用，內容腳本會阻擋原腳本及修改腳本，內容腳本同時也是使用者腳本。
 
+### 2022.04.14.10
+
+史詩級的新功能：記住對手如何拿到牌的、查看雙方目前不在的prisms卡
+
 ## 贊助
 
 用這個贏了？不如請我一杯咖啡吧！  
 我的加密貨幣地址：
 ```
-BTC   bc1qttretrlxjfv2363zdg7xvthyvrstsru0mhangk  
-ETH   0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-BNB   bnb1pqzkpxl5s5wc3s7h2hga5hq8sn98sz4a0xefec  
-LUNA  terra1upxh8ufp3carg8z8nc39sdrsrn02cde8hxxlz9  
-SOL   2V9Ux48XttpH3r4ZTg3rxRpd5fmLiYz2EAq2eCSNifCY  
-DOT   14j8gPesPyxmw4eC1rBpUqgydT3xw7KJSo2dJ6VuigG9J4E9  
-AVAX  0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-DOGE  DA19CxjfTkURNVxs5fNeZGNdsUPsStax5E  
-MATIC 0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-LTC   ltc1qlgqh5aqemjazsfnq7zxayg6y75aqv7twl2r56d  
-ATOM  cosmos1gaqjnqrz9aae2w03dw3zr3xr8un2tnpnv075rf  
-FTT   0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-THETA 0xa3415F2e117A256c3371B7ee4a6340862A1294E9  
-GRT   0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-CAKE  0x760a6c97eAcABFE46D6c602a371f42099d6a8576  
-DASH  XgrxBD5KWjnYaScpNd6u4fGxiYfc9u2uBN  
-DGB   dgb1q65h5v9990mrx2eutyu4xud23qlty6e5u66xzv9  
-XNO   nano_1m5kn3h34gibzoz54g9yie5je5c6psiofiwr4tcx3um8up3abaz31z33tqo4  
-TT    0x08AF0f949a8Af3027177C8b42B91d85f951a487B  
+Skyweaver Sequence wallet
+      0xB77702eF2213e0472f8071c6209CbD10324b3c21
+BTC   bc1qttretrlxjfv2363zdg7xvthyvrstsru0mhangk
+ETH AVAX MATIC FTT GRT CAKE
+      0x760a6c97eAcABFE46D6c602a371f42099d6a8576
+BNB   bnb1pqzkpxl5s5wc3s7h2hga5hq8sn98sz4a0xefec
+LUNA  terra1upxh8ufp3carg8z8nc39sdrsrn02cde8hxxlz9
+SOL   2V9Ux48XttpH3r4ZTg3rxRpd5fmLiYz2EAq2eCSNifCY
+DOT   14j8gPesPyxmw4eC1rBpUqgydT3xw7KJSo2dJ6VuigG9J4E9
+DOGE  DA19CxjfTkURNVxs5fNeZGNdsUPsStax5E
+LTC   ltc1qlgqh5aqemjazsfnq7zxayg6y75aqv7twl2r56d
+ATOM  cosmos1gaqjnqrz9aae2w03dw3zr3xr8un2tnpnv075rf
+THETA 0xa3415F2e117A256c3371B7ee4a6340862A1294E9
+DASH  XgrxBD5KWjnYaScpNd6u4fGxiYfc9u2uBN
+DGB   dgb1q65h5v9990mrx2eutyu4xud23qlty6e5u66xzv9
+XNO   nano_1m5kn3h34gibzoz54g9yie5je5c6psiofiwr4tcx3um8up3abaz31z33tqo4
+TT    0x08AF0f949a8Af3027177C8b42B91d85f951a487B
 LBC   bZqCwFPuGDaQfH5W1QYy19Fs4uGF83UvgC
 ```
