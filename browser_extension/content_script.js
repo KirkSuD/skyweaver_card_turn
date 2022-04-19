@@ -17,17 +17,109 @@
 (async function() {
 'use strict';
 
+class log {
+    // error warn info log debug
+    // error: assert  log: dir dirxml trace
+    static get prependMessage() {
+        return "Skyweaver card turn:";
+    }
+    static alert(msg, error=null, errorStack=null) {
+        let txt = `Skyweaver card turn extension: ${msg}\n` +
+            "Disable extension and notify developer if this happened multiple times.";
+        if (error !== null) {
+            txt += `\nError detail: ${error}`;
+        }
+        if (errorStack !== null) {
+            txt += `\nError stack trace: ${errorStack}`;
+        }
+        alert(txt);
+    }
+    static assert(assertion, ...args) { // level: error
+        console.assert(assertion, this.prependMessage, ...args);
+    }
+    static debug(...args) {
+        console.debug(this.prependMessage, ...args);
+    }
+    static dir(...args) { // level: log
+        console.dir(this.prependMessage, ...args);
+    }
+    static dirxml(...args) { // level: log
+        console.dirxml(this.prependMessage, ...args);
+    }
+    static error(...args) {
+        console.error(this.prependMessage, ...args);
+    }
+    static info(...args) {
+        console.info(this.prependMessage, ...args);
+    }
+    static log(...args) {
+        console.log(this.prependMessage, ...args);
+    }
+    static trace(...args) { // level: log
+        console.trace(this.prependMessage, ...args);
+    }
+    static warn(...args) {
+        console.warn(this.prependMessage, ...args);
+    }
+}
+
 try {
 
-console.log("Skyweaver card turn:", "start");
+log.log("global start");
 
 function cardTurnSubscriber() {
+    class log {
+        // error warn info log debug
+        // error: assert  log: dir dirxml trace
+        static get prependMessage() {
+            return "Skyweaver card turn:";
+        }
+        static alert(msg, error=null, errorStack=null) {
+            let txt = `Skyweaver card turn extension: ${msg}\n` +
+                "Disable extension and notify developer if this happened multiple times.";
+            if (error !== null) {
+                txt += `\nError detail: ${error}`;
+            }
+            if (errorStack !== null) {
+                txt += `\nError stack trace: ${errorStack}`;
+            }
+            alert(txt);
+        }
+        static assert(assertion, ...args) { // level: error
+            console.assert(assertion, this.prependMessage, ...args);
+        }
+        static debug(...args) {
+            console.debug(this.prependMessage, ...args);
+        }
+        static dir(...args) { // level: log
+            console.dir(this.prependMessage, ...args);
+        }
+        static dirxml(...args) { // level: log
+            console.dirxml(this.prependMessage, ...args);
+        }
+        static error(...args) {
+            console.error(this.prependMessage, ...args);
+        }
+        static info(...args) {
+            console.info(this.prependMessage, ...args);
+        }
+        static log(...args) {
+            console.log(this.prependMessage, ...args);
+        }
+        static trace(...args) { // level: log
+            console.trace(this.prependMessage, ...args);
+        }
+        static warn(...args) {
+            console.warn(this.prependMessage, ...args);
+        }
+    }
     let turn = 0, hand = [], rootDivPos = ["180px", "10%"],
         noerror = true, enemy = null, rootDiv = null, viewingCards = null, showingHand = null;
     const cards = n.a, playerOpponentZones = i(44).b;
     window.playerOpponentZones = playerOpponentZones;
     window.cards = cards;
-    window.cardTurnDebug = [];
+    window.skyweaverWorkerProxyStoreEvents = [];
+    // window.cardTurnDebug = [];
     const icons = {
         element: {
             air: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAABFZJREFUaEPtWU1S40YU/p5SGbEb5gSBEwSWiEVgk5FXY04wnhOMzAViLoDMCfCcILCyJxvMAnsZcYLYJ4izQ1SNX+rJMgNyd6tbCCiqpquooqzu1vvez/d+RHjli165/PgB4KUt+KQWiC4u1mnt9gMxNxlYB7CR/wnuBMCMiYYETPjmzXl3f3/mqpAnARCN+3se02cGmi4CMaMHj4+6O42J7blaAYjGPT89dRVcIeyQU//AxiK1AYhGX5sEPsXCVepYE2bvoLv7u7iadtUC4HA0iBiI65C6cMeMiQ+6O42h7u5HAzgc91vMJJp3XHxJjCE8TObAnc97wAYzSezsAXgrlzJ72zpLPApA7jZ/Okj+H8BnTOjYBGp09dcW0bcuQG859fdVMVEZQEaRfvpPBZ8fMpAQUWJLneKiYF4/3m10isrSAhABTSxweNXvMNEfDtpXbZ0x0APxSZlFonF/Azdrs6JMWgAioAqxSCGXEdPfFbSvwysJrBMH4YmrQpQAcvdI4iCUzLmy2qN+D6CPri+z2G/N/8u7lAAWtMjNOGgIEygADMT3leAshCzbkugCVnVQCaA96me8qwKQu48AeMplDWIFQO4+/y4AhCvPHXg/o0wiZMpgpi0saqNfbJATcHYchAdle1cBjPt7xHSRvZR4v5gFLf3/nFO/VWSMXDlChZ/LBMveDzroBu/PTHuNAACcxEEY3b9g4V70m/5SvtTFzvKMpRJk+4xTf9NE52UuIky07QKAiTdLOX2RBKVIK3UnYj7S0bnIVQZANrSPg7D7XXsD+V/tAozreDcUXy9d7dFAXOND6UZgEgfhpm5fmQutmNGcgflLHDRaFkLBJZObYmEVQFZAzSXL3q37jFBSOp/HQWjVhbkAMLmRJg8MuKhFJup0d94fleQBo7ldYunh+/XEoAOg9E+xxDz1P5kCUEW9RWVUqKVmcRC+U7mmupQwNymJEDQIv2p8fcKpv22ivvZoIHlGWabo4keVVJUsJD/mCUe6pKwjqrAmTPypmARzzUsDZMVU99/rBEAOugSZAWDCjASEGS2EdtL6owDUYIUKhtMemepKe2NL6VC41Sms4i5HFnpId4bMW5fYjOvsKg0xOOeBolwOxZc7JMY13/p7pgGBiZqtpxLt0RNYQoSH18LtzxPy06wHUSyt/2tpVKfGPCakmKtKr/eu5i+crkWSL2QYvOxBiu8uFpOK525Wzwa4b24iJpI+oQIQvswHW3fjQgNZTDn1t5z6AVs4d0BATUNWXl43BXjIhN5KcjMMyCp1ZLYAivtkDAjv27o3/56s5uQloHlianD0CdOuNLcO4qrATOf040k74Z2DuG4Q0dXglAgPG6CcVm0+brwoAKXwiiFCmdJexIUUwk8ZFJWNUFRgnhVAzvcy0V5WpVMi7hzvNHplmtY9fxYA7fHXj2BugfEOxDP5MjPHT2dl379sQD0LABtBqu75AaCq5uo69+ot8D82ezlP+6T90gAAAABJRU5ErkJggg==",
@@ -53,10 +145,9 @@ function cardTurnSubscriber() {
     }
     const savedDataKeys = "turn hand rootDivPos";
     if (savedHand && savedDataKeys.split(" ").every(k => k in savedHand)) {
-        console.log("Skyweaver card turn:", "load state from localStorage:", savedHand);
+        log.log("load state from localStorage:", savedHand);
         ({turn, hand, rootDivPos} = savedHand);
     }
-    window.skyweaverActionHistoryEvents = [];
     function deepCopy(x) {
         return JSON.parse(JSON.stringify(x));
     }
@@ -91,19 +182,22 @@ function cardTurnSubscriber() {
         }
         handleEvent(ev) {
             this.events.push(ev);
-            const res = this.parseAction();
-            if (res !== null && res.length === 1) {
-                console.log("Skyweaver card turn:", "handleEvent res:", res);
+            const act = this.parseAction();
+            const res = {action: deepCopy(act)};
+            if (act !== null && act.length === 1) {
+                log.debug("handleEvent act:", act);
+                res.lastAction = deepCopy(this.lastAction);
+                res.callbackResult = deepCopy(this.callbackFunc(act[0], this.lastAction));
                 this.events = [];
-                this.callbackFunc(res[0], this.lastAction);
-                this.lastAction = res[0];
+                this.lastAction = act[0];
             }
+            return res;
         }
         parseAction(until=null, currentIndex=[0]) {
             // from action_parser.py parse_action
             const parent_items = [];
             const parent_new_content = {};
-            // console.log("Skyweaver card turn:", "parseAction currentIndex:", currentIndex);
+            // log.log("parseAction currentIndex:", currentIndex);
             while (currentIndex[0] < this.events.length) {
                 const ev = this.events[currentIndex[0]];
                 currentIndex[0]++;
@@ -215,7 +309,7 @@ function cardTurnSubscriber() {
                             }
                         }
                         if (action_type === until) {
-                            // console.log("Skyweaver card turn:", "parseAction: return:", parent_items, currentIndex[0], this.events.length);
+                            // log.log("parseAction: return:", parent_items, currentIndex[0], this.events.length);
                             return [parent_items, parent_new_content];
                         }
                     }
@@ -245,26 +339,29 @@ function cardTurnSubscriber() {
                 return null;
             }
             else {
-                // console.log("Skyweaver card turn:", "parseAction: return:", parent_items, currentIndex, this.events.length);
+                // log.log("parseAction: return:", parent_items, currentIndex, this.events.length);
                 return parent_items;
             }
         }
     }
     function actionHandler(action, lastAction) {
-        console.log("Skyweaver card turn:", "actionHandler:", action);
+        log.debug("actionHandler:", action);
         if (action.type === "Setup") {
             // new game, reset state
-            console.log("Skyweaver card turn:", "new game");
+            log.log("new game");
             turn = 0, hand = [];
         }
         else if (action.type === "StartTurn" && action.content.player === enemy) {
-            console.log("Skyweaver card turn:", "start turn", turn);
+            log.log("start turn", turn);
             turn++;
         }
-        recursiveHandHandler(action, lastAction);
+        return recursiveHandHandler(action, lastAction);
     }
     function findCardBase(i) {
-        console.log("Skyweaver card turn:", "findCardBase:", i);
+        // log.log("findCardBase:", i);
+        if (i === null) {
+            return null;
+        }
         for (const zone in playerOpponentZones) {
             for (const item of playerOpponentZones[zone].items) {
                 if (!item.has("cardInstance")) {
@@ -276,10 +373,11 @@ function cardTurnSubscriber() {
                 }
             }
         }
+        log.warn("findCardBase:", "not found:", i);
         return null;
     }
-    function recursiveHandHandler(action, lastRootAction, ancestors=[]) {
-        console.log("Skyweaver card turn:", "recursiveHandHandler:", action);
+    function recursiveHandHandler(action, lastRootAction, ancestors=[], result=[]) {
+        // log.debug("recursiveHandHandler:", action);
         if (action.type === "In" && action.content.toPlayer === enemy) {
 
             const newHand = {
@@ -352,27 +450,37 @@ function cardTurnSubscriber() {
                     }
                 }
             }
-            if (!["StartTurn", "EndTurn", "PlayCard", "Attack"].includes(newHand.action) || newHand.player === null) {
-                console.log("Skyweaver card turn:", "recursiveHandHandler:", "weirdHand:",
+            if (!["StartTurn", "EndTurn", "PlayCard", "Attack", "CardSelection", "Limbo"].includes(newHand.action) || newHand.player === null) {
+                log.warn("recursiveHandHandler:", "weirdHand:",
                     newHand, action, lastRootAction, ancestors, ancestors.length);
             }
-            console.log("Skyweaver card turn:", "recursiveHandHandler: newHand:", action);
+            // log.log("recursiveHandHandler:", "newHand:", action);
+            log.log("Skyweaver card turn:", "draw",
+                action.content.fromPlayer, action.content.fromZone, action.content.fromIndex,
+                "->", action.content.toPlayer, action.content.toZone, action.content.toIndex);
             addHand(newHand);
             hand.push(newHand);
+            result.push(["addHand", newHand]);
         }
         else if (action.type === "Out" && action.content.fromPlayer === enemy) {
+            log.log("Skyweaver card turn:", "play",
+                action.content.fromPlayer, action.content.fromZone, action.content.fromIndex,
+                "->", action.content.toPlayer, action.content.toZone, action.content.toIndex);
             removeHand(action.content.fromIndex);
+            result.push(["removeHand", action.content.fromIndex]);
         }
         else if (action.items) {
             ancestors.push(action);
             for (const item of action.items) {
-                recursiveHandHandler(item, lastRootAction, ancestors);
+                recursiveHandHandler(item, lastRootAction, ancestors, result);
             }
             ancestors.pop();
         }
+        return result;
     }
+
     function addHand(newHand) {
-        console.log("Skyweaver card turn:", "addHand:", newHand);
+        log.debug("addHand:", newHand);
         // const isGift = !['CardSelection', 'Deck', 'Hand'].includes(newHand.fromZone);
         const [special, ,] = getHandInfo(newHand);
         const inlineStyle = special ? ' style="text-decoration:underline"' : "";
@@ -391,6 +499,7 @@ function cardTurnSubscriber() {
         newHand.domElem = newSpan;
     }
     function removeHand(idx) {
+        log.debug("removeHand:", idx);
         if (showingHand === hand[idx]) {
             hideHand();
         }
@@ -418,10 +527,10 @@ function cardTurnSubscriber() {
         if (h.toMulligan !== null && h.drawnMulligan !== null) {
             special = true;
             if (h.toMulligan === h.drawnMulligan) {
-                infoText += `   Mulligan: ${toMulligan}`;
+                infoText += `   Mulligan: ${h.toMulligan}`;
             }
             else {
-                infoText += `   Mulligan: ${h.drawnMulligan}/${toMulligan}`;
+                infoText += `   Mulligan: ${h.drawnMulligan}/${h.toMulligan}`;
             }
         }
         if (h.fatigue !== null) {
@@ -453,8 +562,9 @@ function cardTurnSubscriber() {
 
         return [special, infoText, infoCards];
     }
+
     function showHand(e, h) {
-        console.log("Skyweaver card turn:", "hand:", h);
+        log.log("showHand:", h);
         const [, infoText, infoCards] = getHandInfo(h);
 
         const cardTurnHoverHand = getE("cardTurnHoverHand");
@@ -464,13 +574,24 @@ function cardTurnSubscriber() {
             cardTurnHoverHand.classList.remove("cardTurnHandClosed");
             let h = "";
             for (const c of infoCards) {
-                h += `
-                    <div>
-                        <p>${c[0]}</p>
-                        <div class="cardTurnImgContainer">
-                            <img src="https://assets.skyweaver.net/latest/full-cards/4x/${c[1]}.png">
-                        </div>
-                    </div>`;
+                if (c[1] === "Hero") {
+                    h += `
+                        <div>
+                            <p>${c[0]}</p>
+                            <div class="cardTurnImgContainer">
+                                <p>Hero</p>
+                            </div>
+                        </div>`;
+                }
+                else {
+                    h += `
+                        <div>
+                            <p>${c[0]}</p>
+                            <div class="cardTurnImgContainer">
+                                <img src="https://assets.skyweaver.net/latest/full-cards/4x/${c[1]}.png">
+                            </div>
+                        </div>`;
+                }
             }
             getE("cardTurnHoverHandCards").innerHTML = h;
         }
@@ -510,8 +631,9 @@ function cardTurnSubscriber() {
         getE("cardTurnHoverHand").style.display = "none";
         showingHand = null;
     }
+
     function showCard(e, cid) {
-        console.log("Skyweaver card turn:", "showCard", e, cid);
+        log.log("showCard", e, cid);
         const rootDiv = getE("cardTurnRootDiv");
         const hoverImg = getE("cardTurnHoverImg");
         const hoverImgSize = [346/2, 532/2];
@@ -538,13 +660,12 @@ function cardTurnSubscriber() {
         hoverImg.style.display = "unset";
     }
     function toggleViewCards(enemyPlayer) {
-        console.log("Skyweaver card turn:", "toggleViewCards");
-        console.log("Skyweaver card turn:", "innerText", getE(`cardTurn${enemyPlayer}Btn`).innerText);
+        log.log("toggleViewCards:", enemyPlayer);
         if (viewingCards !== enemyPlayer) {
             // detemine which prisms to include, which cards to exclude
             const target = (enemyPlayer === "Enemy") ? (1-v.player) : v.player;
             const prisms = v.state.state.players[target].prisms;
-            console.log("Skyweaver card turn:", "prisms:", prisms);
+            log.log("prisms:", prisms);
             let excludeCards=[];
             for (const zone of ["Deck", "Hand", "Field", "Graveyard"]) {
                 let zoneName = ((enemyPlayer === "Enemy") ? "Opponent_" : "Player_");
@@ -586,6 +707,7 @@ function cardTurnSubscriber() {
                 }
                 return 0;
             });
+            log.log("toggleViewCards:", "viewCards:", viewCards);
             // show cards
             const prismFullName = {
                 str: "Strength", wis: "Wisdom", agy: "Agility", hrt: "Heart", int: "Intellect"
@@ -640,6 +762,7 @@ function cardTurnSubscriber() {
             viewingCards = null;
         }
     }
+
     const actParser = new myActionParser(actionHandler);
     function workerProxyStoreSubscriber(ev) {
         function saveLocalStorage() {
@@ -648,21 +771,21 @@ function cardTurnSubscriber() {
             }));
         }
         function draggable(elem) {
-            console.log("Skyweaver card turn:", "draggable");
+            // log.log("draggable");
             elem.onmousedown = function(e) {
-                // console.log("Skyweaver card turn:", "mouse down");
+                // log.log("mouse down");
                 e = e || window.event;
                 e.preventDefault();
                 const [dx, dy] = [elem.offsetLeft-e.clientX, elem.offsetTop-e.clientY];
-                // console.log("Skyweaver card turn:", "coord:", x, y, elem.offsetLeft, elem.offsetTop);
+                // log.log("coord:", x, y, elem.offsetLeft, elem.offsetTop);
                 document.onmousemove = function(e) {
                     e = e || window.event;
                     e.preventDefault();
                     // const [dx, dy] = [e.clientX - x, e.clientY - y];
                     // [x, y] = [e.clientX, e.clientY];
 
-                    // console.log("Skyweaver card turn:", "mouse move", x, y, dx, dy);
-                    // console.log("Skyweaver card turn:", "coord:", x, y, elem.offsetLeft, elem.offsetTop);
+                    // log.log("mouse move", x, y, dx, dy);
+                    // log.log("coord:", x, y, elem.offsetLeft, elem.offsetTop);
                     const safe = 10;
                     let [newx, newy] = [e.clientX + dx, e.clientY + dy];
                     newx = Math.max(-elem.offsetWidth+safe, newx);
@@ -675,7 +798,7 @@ function cardTurnSubscriber() {
                     }
                 };
                 document.onmouseup = function() {
-                    // console.log("Skyweaver card turn:", "mouse up");
+                    // log.log("mouse up");
                     document.onmousemove = null;
                     document.onmouseup = null;
                     rootDivPos[0] = elem.style.left;
@@ -690,17 +813,16 @@ function cardTurnSubscriber() {
             return;
         }
         try {
-            const evt = ev.type, payload = ev.payload;
             if (enemy === null) {
-                window.skyweaverWorkerProxyStoreEvents = [];
                 enemy = 1-v.player;
-                console.log("Skyweaver card turn:", "enemy:", enemy);
+                log.log("enemy:", enemy);
             }
-            window.skyweaverWorkerProxyStoreEvents.push([
-                turn, window.skyweaverActionHistoryEvents.length, ev
-            ]);
             // JSON.stringify(window.skyweaverWorkerProxyStoreEvents) then copy object to debug
-            actParser.handleEvent(ev);
+            // log.debug("event:", ev);
+            window.skyweaverWorkerProxyStoreEvents.push([turn, null, null, ev]);
+            const eventHandleResult = actParser.handleEvent(ev);
+            window.skyweaverWorkerProxyStoreEvents[window.skyweaverWorkerProxyStoreEvents.length-1][1] = deepCopy(hand);
+            window.skyweaverWorkerProxyStoreEvents[window.skyweaverWorkerProxyStoreEvents.length-1][2] = eventHandleResult;
             saveLocalStorage();
 
             if (rootDiv === null) {
@@ -919,6 +1041,7 @@ function cardTurnSubscriber() {
 .cardTurnImgContainer {
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 .cardTurnImgContainer > img {
     max-width: 100%;
@@ -939,25 +1062,25 @@ function cardTurnSubscriber() {
 }
                 `;
 
-                console.log("Skyweaver card turn: create root div");
+                log.log("create root div");
                 const temp = document.createElement("template");
                 temp.innerHTML = rootDivHTML.trim();
                 rootDiv = temp.content.firstChild;
                 for (let node of temp.content.childNodes) {
                     document.getElementsByTagName("body")[0].appendChild(node);
                 }
-                console.log("Skyweaver card turn:", "rootDiv", rootDiv);
+                log.log("rootDiv", rootDiv);
 
                 const newStyle = document.createElement("style");
                 newStyle.innerHTML = rootDivCSS;
                 document.getElementsByTagName("head")[0].appendChild(newStyle);
 
                 getE("cardTurnEnemyBtn").onclick = function() {
-                    console.log("Skyweaver card turn:", "cardTurnEnemyBtn");
+                    // log.log("cardTurnEnemyBtn");
                     toggleViewCards("Enemy");
                 };
                 getE("cardTurnPlayerBtn").onclick = function() {
-                    console.log("Skyweaver card turn:", "cardTurnPlayerBtn");
+                    // log.log("cardTurnPlayerBtn");
                     toggleViewCards("Player");
                 };
 
@@ -967,15 +1090,11 @@ function cardTurnSubscriber() {
                     addHand(h);
                 }
             }
-            
         }
         catch (error) {
-            console.log("Skyweaver card turn:", "workerProxyStoreSubscriber error:", error);
-            alert(
-                "Skyweaver card turn extension: error occurred in workerProxyStoreSubscriber!\n" +
-                "Disable extension and notify developer if this happened multiple times.\n" +
-                "Error detail: " + error
-            );
+            log.error("workerProxyStoreSubscriber error:", error);
+            log.trace("workerProxyStoreSubscriber error trace:",);
+            log.alert("error occurred in workerProxyStoreSubscriber!", error, error.stack);
             noerror = false;
         }
     }
@@ -984,23 +1103,23 @@ function cardTurnSubscriber() {
 function patchScript(originalJS) {
     const insertPoint = originalJS.indexOf("function cardEntityOwner(e){return");
     if (insertPoint === -1) {
-        alert(
-            "Skyweaver card turn extension: Skyweaver code changed!\n" +
-            "Disable extension and notify developer if this happened multiple times."
-        );
+        log.alert("Skyweaver code changed!", "insert point not found.")
         return;
     }
     const insertCode = `
+        console.log("subscribeToCardEvents", "start");
         try {
             const workerProxyStoreSubscriber = (${cardTurnSubscriber})();
             v.subscribeToCardEvents(workerProxyStoreSubscriber);
         }
         catch (error) {
-            console.log("Skyweaver card turn:", "subscribeToCardEvents error:", error);
+            console.error("Skyweaver card turn:", "subscribeToCardEvents error:", error);
+            console.trace("Skyweaver card turn:", "subscribeToCardEvents error trace:");
             alert(
                 "Skyweaver card turn extension: error occurred when subscribing event!\\n" +
                 "Disable extension and notify developer if this happened multiple times.\\n" +
-                "Error detail: " + error
+                "Error detail: " + error + "\\n" +
+                "Error stack trace:" + error.stack
             );
         }
         console.log("Skyweaver card turn:", "subscribeToCardEvents", "finish");
@@ -1019,7 +1138,7 @@ function addScript(text) {
 const registrations = await navigator.serviceWorker.getRegistrations();
 if (registrations.length > 0) {
     for(let registration of registrations) {
-        console.log("Skyweaver card turn:", "remove service worker:", registration);
+        log.log("remove service worker:", registration);
         registration.unregister();
     }
     location.reload(true);
@@ -1031,18 +1150,22 @@ window.addEventListener("load", function() {
         const src = elem.getAttribute("src");
         // https:\/\/play\.skyweaver\.net
         const toMatch = /^\/game\/([a-f0-9]){40}\/main-([a-f0-9]){20}.js$/g;
-        console.log("Skyweaver card turn:", "found script:", src);
+        log.log("found script:", src);
         if (src && src.match(toMatch)) {
-            console.log("Skyweaver card turn:", "fetch script:", src);
+            log.log("fetch script:", src);
             fetch("https://play.skyweaver.net"+src).then(response => {
-                console.log("Skyweaver card turn:", "got response.");
+                log.log("got response.");
                 return response.text();
             }).then(text => {
-                console.log("Skyweaver card turn:", "patching script...");
+                log.log("patching script...");
                 text = patchScript(text);
                 addScript(text);
-                console.log("Skyweaver card turn:", "patched script.");
-            }).catch(function(err) {console.log("Skyweaver card turn:", "error:", err);});
+                log.log("patched script.");
+            }).catch(function(error) {
+                log.error("patch script error:", error);
+                log.trace("patch script error trace:");
+                log.alert("patch script error!", error, error.stack);
+            });
         }
     }
 });
@@ -1050,19 +1173,21 @@ window.addEventListener("load", function() {
 window.addEventListener('beforescriptexecute', function(e) {
     // only firefox would trigger beforescriptexecute
     const src = e.target.src;
-    console.log("Skyweaver card turn: detect script:", src);
+    log.log("detect script:", src);
     if (src.match(/^https:\/\/play\.skyweaver\.net\/game\/([a-f0-9]){40}\/main-([a-f0-9]){20}.js$/g)) {
-        console.log("Skyweaver card turn: block script:", src);
+        log.log("block script:", src);
         e.preventDefault();
         e.stopPropagation();
     }
 });
 
-console.log("Skyweaver card turn:", "finish");
+log.log("global finish");
 
 }
 catch (error) {
-    console.log("Skyweaver card turn:", "error:", error);
+    log.error("global error:", error);
+    log.trace("global error trace:");
+    log.alert("content script global code error!", error, error.stack);
 }
 
 })();
