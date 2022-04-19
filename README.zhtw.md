@@ -11,6 +11,7 @@
 <!-- ![截圖](https://i.imgur.com/Y48UsBB.png) -->
 [![截圖](https://i.imgur.com/OPiGp3A.png)](https://i.imgur.com/39WCBEW.mp4)
 [![截圖](https://i.imgur.com/443bnNP.png)](https://i.imgur.com/39WCBEW.mp4)
+[![截圖](https://i.imgur.com/Nl8VPLI.png)](https://i.imgur.com/39WCBEW.mp4)
 <!-- https://imgur.com/a/PfjH1bT -->
 
 ## 功能
@@ -29,6 +30,7 @@
 - 以底線標記特殊卡牌 (不是選卡或回合開始抽來的)  
 - 檢視對手的和你的不在場上/手上/牌組/墳墓的英雄相應Prism卡牌
 - 可拖曳的顯示方塊
+- 過濾卡片 (按 "prism cards" 文字)
 - 儲存狀態在瀏覽器 localStorage，所以可以在您的回合重整網頁
 
 ## 安裝
@@ -37,7 +39,7 @@
 
 還沒有上架 Chrome/Firefox 的外掛商店，請下載安裝。
 
-1. 下載 [最新的 release/browser_extension_版本.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.04.14.10.zip)
+1. 下載 [最新的 release/browser_extension_版本.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.04.19.07.zip)
 2. 解壓 zip 到資料夾
 3. 根據瀏覽器，繼續以下操作
 
@@ -83,7 +85,7 @@
 
 要檢視輸出，在開發者工具搜尋 "Skyweaver card turn"。  
 要尋找問題，當你發現問題，遊戲結束後不要離開，按F12開啟開發者工具，  
-    輸入 "JSON.stringify(window.skyweaverWorkerProxyStoreEvents)"，  
+    輸入 `JSON.stringify(window.skyweaverWorkerProxyStoreEvents)`，  
     在輸出的 json 訊息上按右鍵，按 "複製物件"，以文字檔儲存，  
     這包含剛剛遊戲的所有事件，對除錯可能有幫助。
 
@@ -121,6 +123,12 @@ Firefox的背景腳本無作用，內容腳本會阻擋原腳本及修改腳本�
 ### 2022.04.14.10
 
 史詩級的新功能：記住對手如何拿到牌的、查看雙方目前不在的prisms卡
+
+### 2022.04.19.07
+
+修正bug: toMulligan、hero破圖。  
+更好的 logging、更好的debug用資料匯出。  
+新功能：過濾卡片。
 
 ## 贊助
 

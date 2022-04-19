@@ -2,7 +2,7 @@
 // @name        Skyweaver enemy card draw turn memorizer
 // @name:zh-TW  Skyweaver 對手抽卡記憶器
 // @namespace   https://github.com/KirkSuD
-// @version     2022.04.14.10
+// @version     2022.04.19.07
 // @description This script remembers which turn the enemy drew the cards by replacing/patching JS.
 // @description:zh-TW 這個腳本通過攔截並修改網頁JS程式來抓取資料，記住對手抽卡資訊。
 // @match       https://play.skyweaver.net/game/*
@@ -632,8 +632,239 @@ function cardTurnSubscriber() {
         showingHand = null;
     }
 
+    class cardFilter {
+        static capitalize(s) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+        static toCapitalizeObject(s) {
+            const res = {};
+            for (const i of s.split(" ")) {
+                res[i] = this.capitalize(i);
+            }
+            return res
+        }
+        static get zones() {
+            return this.toCapitalizeObject("Deck Hand Field Graveyard");
+        }
+        static get schema() {
+            return {
+                columns: [
+                    "inPlayerZone outPlayerZone prism element triggers".split(" "),
+                    "inEnemyZone outEnemyZone cardType traits manaCost".split(" ")
+                ],
+                areas: {
+                    inPlayerZone: { text: "+ Player", values: this.zones },
+                    outPlayerZone: { text: "- Player", values: this.zones },
+                    inEnemyZone: { text: "+ Enemy", values: this.zones },
+                    outEnemyZone: { text: "- Enemy", values: this.zones },
+                    prism: {
+                        text: "PRISM",
+                        values: {str: "Strength", wis: "Wisdom", agy: "Agility", hrt: "Heart", int: "Intellect"}
+                    },
+                    cardType: {
+                        text: "CARD TYPE",
+                        values: this.toCapitalizeObject("Spell Unit")
+                    },
+                    element: {
+                        text: "ELEMENT",
+                        values: this.toCapitalizeObject("air dark earth fire light metal mind water")
+                    },
+                    traits: {
+                        text: "TRAITS",
+                        values: this.toCapitalizeObject("Stealth Wither Guard Banner Lifesteal Armor")
+                    },
+                    triggers: {
+                        text: "TRIGGERS",
+                        values: this.toCapitalizeObject("Play Summon Inspire Glory Sunset Sunrise Mulligan Draw Dust Death")
+                    },
+                    manaCost: {
+                        text: "MANA COST",
+                        values: this.toCapitalizeObject("0 1 2 3 4 5 6 7 8 9 10 11 X")
+                    }
+                }
+            };
+        }
+        static extractCard(c, id) {
+            const triggers = [];
+            if ("parsedDescription" in c) {
+                // example card without description:
+                // https://assets.skyweaver.net/latest/full-cards/4x/13.png
+                c.parsedDescription.forEach(element => {
+                    /*
+                    parsedDescription type: [
+                        "normal",     // useless??
+                        "buff",       // useless // +-num damage/health/power
+                        "bold",
+                        "trigger",
+                        "mana",       // useless // +-num cost
+                        "element",    // useless // the element
+                        "card",       // useless // card names
+                        "multistat",  // useless // +num/-num
+                        "triggerElement",  // element
+                        "explainer"   // not what i want
+                    ]
+                    */
+                    let txt = element.value.text;
+                    if (!txt) {
+                        return;
+                    }
+                    if (element.type === "bold") {
+                        txt = this.capitalize(txt);
+                        if (txt in this.schema.areas.triggers.values) {
+                            triggers.push(txt);
+                        }
+                    }
+                    else if (element.type === "trigger") {
+                        if (txt.startsWith(" ")) {
+                            txt = txt.slice(1);
+                        }
+                        if (txt.endsWith(":")) {
+                            txt = txt.slice(0, -1);
+                        }
+                        if (txt.startsWith("Inspire ")) {
+                            triggers.push("Inspire");
+                        }
+                        else if (txt === "Summon & Death") {
+                            triggers.push("Summon");
+                            triggers.push("Death");
+                        }
+                        else if (txt in this.schema.areas.triggers.values) {
+                            triggers.push(txt);
+                        }
+                    }
+                });
+            }
+            return {
+                id: id, name: c.name,
+                prism: c.prism, cardType: c.type, element: c.element,
+                traits: c.traits, triggers: triggers, manaCost: c.cost.toString()
+            };
+        }
+        static update() {
+            const filters = {};
+            document.querySelectorAll("#cardTurnCardsFilter > div > input").forEach(elem => {
+                if (elem.checked) {
+                    const [k, v] = elem.value.split("_");
+                    if (!(k in filters)) {
+                        filters[k] = [];
+                    }
+                    filters[k].push(v);
+                }
+            });
+            log.log("filters:", filters);
+            const inCards=[], outCards=[];
+            for (const [arr, playerOpponent, area] of [
+                [inCards, "Player", "inPlayerZone"],
+                [inCards, "Opponent", "inEnemyZone"],
+                [outCards, "Player", "outPlayerZone"],
+                [outCards, "Opponent", "outEnemyZone"],
+            ]) {
+                if (!(area in filters)) {
+                    continue;
+                }
+                for (const zone of filters[area]) {
+                    const zoneName = `${playerOpponent}_${zone}`;
+                    playerOpponentZones[zoneName].items.forEach(item => {
+                        if (item.has("cardInstance")) {
+                            arr.push(item.get("cardInstance").base);
+                        }
+                    });
+                }
+                delete filters[area];
+            }
+            const viewCards = [];
+            cards.forEach((c, id) => {
+                const card = this.extractCard(c, id);
+                if (card.cardType === "Enchant" || !(card.prism in this.schema.areas.prism.values)) {
+                    return;
+                }
+                if (inCards.length > 0 && !inCards.includes(id)) {
+                    return;
+                }
+                else if (outCards.includes(id)) {
+                    return;
+                }
+                for (const area in filters) {
+                    if (area === "traits" || area === "triggers") {
+                        if (filters[area].every(v => !card[area].includes(v))) {
+                            return;
+                        }
+                    }
+                    else if (!(filters[area].includes(card[area]))) {
+                        return;
+                    }
+                }
+                viewCards.push(card);
+            });
+
+            // filter & sort cards
+            const elementCount = {}, typeCount = {};
+            viewCards.forEach((c, id) => {
+                elementCount[c.element] = (elementCount[c.element] ?? 0) + 1;
+                typeCount[c.cardType] = (typeCount[c.cardType] ?? 0) + 1;
+            });
+            viewCards.sort((a, b) => {
+                function getCost(costStr) {
+                    return (costStr === "X") ? Infinity : parseInt(costStr);
+                }
+                for (const k of ["manaCost", "name"]) {
+                    let ak = a[k], bk = b[k];
+                    if (k === "manaCost") {
+                        ak = getCost(ak);
+                        bk = getCost(bk);
+                    }
+                    if (ak < bk) {
+                        return -1;
+                    }
+                    else if (ak > bk) {
+                        return 1;
+                    }
+                }
+                return 0;
+            });
+            log.log("cardFilter:", "update:", "viewCards:", viewCards);
+            // show cards
+            const elementOrder = [
+                "water", "air", "earth", "fire", "dark", "light", "metal", "mind"
+            ];
+            const typeOrder = ["Spell", "Unit"];
+            for (let i=0; i<elementOrder.length; ++i) {
+                const k = elementOrder[i];
+                getE("cardTurnCardsStat").children[8+1+2+i].innerText = elementCount[k] ?? 0;
+            }
+            for (let i=0; i<typeOrder.length; ++i) {
+                const k = typeOrder[i];
+                getE("cardTurnCardsStat").children[8+1+2+8+1+i].innerText = typeCount[k] ?? 0;
+            }
+            getE("cardTurnCardsList").innerHTML = "";
+            for (const c of viewCards) {
+                const cardDiv = document.createElement("div");
+                cardDiv.innerHTML = `
+                    <div>${c.manaCost}</div>
+                    <div class="cardTurnImgContainer">
+                        <img src="${icons.type[c.cardType.toLowerCase()]}">
+                    </div>
+                    <div>${c.name}</div>
+                    <div class="cardTurnImgContainer">
+                        <img src="${icons.element[c.element]}">
+                    </div>`;
+                cardDiv.children[2].style.background = 'linear-gradient(to right, ' +
+                    'rgba(0, 0, 0, 0.75) 20%, rgba(255, 255, 255, 0.5)), ' +
+                    `url("https://assets.skyweaver.net/latest/full-cards/4x/${c.id}.png")` +
+                    "60% 20% / 120% auto";
+                cardDiv.addEventListener("mouseenter", e => { showCard(e, c.id) });
+                getE("cardTurnCardsList").appendChild(cardDiv);
+            }
+        }
+        static clear() {
+            document.querySelectorAll("#cardTurnCardsFilter > div > input").forEach(elem => {
+                elem.checked = false;
+            });
+            this.update();
+        }
+    }
     function showCard(e, cid) {
-        log.log("showCard", e, cid);
+        // log.debug("showCard", e, cid);
         const rootDiv = getE("cardTurnRootDiv");
         const hoverImg = getE("cardTurnHoverImg");
         const hoverImgSize = [346/2, 532/2];
@@ -666,93 +897,26 @@ function cardTurnSubscriber() {
             const target = (enemyPlayer === "Enemy") ? (1-v.player) : v.player;
             const prisms = v.state.state.players[target].prisms;
             log.log("prisms:", prisms);
-            let excludeCards=[];
-            for (const zone of ["Deck", "Hand", "Field", "Graveyard"]) {
-                let zoneName = ((enemyPlayer === "Enemy") ? "Opponent_" : "Player_");
-                zoneName += zone;
-                playerOpponentZones[zoneName].items.forEach(item => {
-                    if (item.has("cardInstance")) {
-                        excludeCards.push(item.get("cardInstance").base);
-                    }
-                });
+            cardFilter.clear();
+            for (const z in cardFilter.zones) {
+                getE(`cardTurnFilterCheckbox_out${enemyPlayer}Zone_${z}`).checked = true;
             }
-            // filter & sort cards
-            const viewCards = [], elementCount = {}, typeCount = {};
-            cards.forEach((c, id) => {
-                if (prisms.includes(c.prism) && !excludeCards.includes(id)) {
-                    viewCards.push({
-                        id: id, cost: c.cost, element: c.element,
-                        name: c.name, prism: c.prism, type: c.type
-                    });
-                    elementCount[c.element] = (elementCount[c.element] ?? 0) + 1;
-                    typeCount[c.type] = (typeCount[c.type] ?? 0) + 1;
-                }
-            });
-            viewCards.sort((a, b) => {
-                function getCost(costStr) {
-                    return (costStr === "X") ? Infinity : parseInt(costStr);
-                }
-                for (const k of ["cost", "name"]) {
-                    let ak = a[k], bk = b[k];
-                    if (k === "cost") {
-                        ak = getCost(ak);
-                        bk = getCost(bk);
-                    }
-                    if (ak < bk) {
-                        return -1;
-                    }
-                    else if (ak > bk) {
-                        return 1;
-                    }
-                }
-                return 0;
-            });
-            log.log("toggleViewCards:", "viewCards:", viewCards);
-            // show cards
-            const prismFullName = {
-                str: "Strength", wis: "Wisdom", agy: "Agility", hrt: "Heart", int: "Intellect"
+            for (const p of prisms) {
+                getE(`cardTurnFilterCheckbox_prism_${p}`).checked = true;
             }
-            // getE("cardTurnCardsText").innerText = prisms.map(p => prismFullName[p]).join(" & ") +
-            //     " cards ∉ " + ((enemyPlayer === "Enemy") ? "enemy graveyard:" : "your deck:");
+            cardFilter.update();
+            
+            // getE("cardTurnCardsText").innerText = (
+            //     (enemyPlayer === "Enemy") ? "Enemy's" : "Your") + " other " +
+            //     prisms.map(p => cardFilter.schema.areas.prism.values[p]).join(" & ") + " cards:";
             getE("cardTurnCardsText").innerText = (
-                (enemyPlayer === "Enemy") ? "Enemy's" : "Your") + " other " +
-                prisms.map(p => prismFullName[p]).join(" & ") + " cards:";
-            const elementOrder = [
-                "water", "air", "earth", "fire", "dark", "light", "metal", "mind"
-            ];
-            const typeOrder = ["Spell", "Unit"];
-            for (let i=0; i<elementOrder.length; ++i) {
-                const k = elementOrder[i];
-                getE("cardTurnCardsStat").children[8+1+2+i].innerText = elementCount[k];
-            }
-            for (let i=0; i<typeOrder.length; ++i) {
-                const k = typeOrder[i];
-                getE("cardTurnCardsStat").children[8+1+2+8+1+i].innerText = typeCount[k];
-            }
-            getE("cardTurnCardsList").innerHTML = "";
-            for (const c of viewCards) {
-                const cardDiv = document.createElement("div");
-                cardDiv.innerHTML = `
-                    <div>${c.cost}</div>
-                    <div class="cardTurnImgContainer">
-                        <img src="${icons.type[c.type.toLowerCase()]}">
-                    </div>
-                    <div>${c.name}</div>
-                    <div class="cardTurnImgContainer">
-                        <img src="${icons.element[c.element]}">
-                    </div>`;
-                cardDiv.children[2].style.background = 'linear-gradient(to right, ' +
-                    'rgba(0, 0, 0, 0.75) 20%, rgba(255, 255, 255, 0.5)), ' +
-                    `url("https://assets.skyweaver.net/latest/full-cards/4x/${c.id}.png")` +
-                    "60% 20% / 120% auto";
-                cardDiv.addEventListener("mouseenter", e => { showCard(e, c.id) });
-                getE("cardTurnCardsList").appendChild(cardDiv);
-            }
+                (enemyPlayer === "Enemy") ? "Enemy's" : "Your") + " other prism cards:";
             getE("cardTurnEnemyBtn").innerText = "+";
             getE("cardTurnPlayerBtn").innerText = "+";
             getE(`cardTurn${enemyPlayer}Btn`).innerText = "x";
             getE("cardTurnRootDiv").style.removeProperty("top");
             getE("cardTurnRootDiv").classList.remove("cardTurnCardsClosed");
+            getE("cardTurnCardsFilter").classList.add("cardTurnCardsFilterClosed");
             viewingCards = enemyPlayer;
         }
         else {
@@ -836,6 +1000,20 @@ function cardTurnSubscriber() {
     <div id="cardTurnCardsRoot">
         <div id="cardTurnCardsText">
             <!-- Cards ∉ your deck: -->
+        </div>
+        <div id="cardTurnCardsFilter" class="cardTurnCardsFilterClosed">
+            <!-- the 2 columns filter box -->
+            <div>
+                <!-- Content set in Javascript
+                <p>+ Player</p>
+                <input type="checkbox" id="cbox_prism_str" value="prism_str" data-com.bitwarden.browser.user-edited="yes">
+                <label for="cbox_prism_str">Strength</label>
+                <br>
+                <input type="checkbox" id="cbox_prism_wis" value="prism_wis" data-com.bitwarden.browser.user-edited="yes">
+                <label for="cbox_prism_wis">Wisdom</label>
+                -->
+            </div>
+            <div></div>
         </div>
         <div id="cardTurnCardsStat">
             <div class="cardTurnImgContainer"><img src="${icons.element.water}"></div>
@@ -955,6 +1133,30 @@ function cardTurnSubscriber() {
 }
 #cardTurnCardsText {
     padding: 10px 8px;
+    cursor: pointer;
+}
+#cardTurnCardsFilter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: calc(100% - 105px);
+    margin: 2px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid rgba(146, 104, 230, 0.8);
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+#cardTurnCardsFilter > div > p {
+    margin: 5px;
+    color: rgb(142, 115, 216);
+    font-weight: bold;
+}
+#cardTurnCardsFilter > div > label {
+    width: 80px;
+    display: inline-block;
+}
+#cardTurnCardsFilter.cardTurnCardsFilterClosed {
+    display: none;
 }
 #cardTurnCardsStat {
     display: grid;
@@ -967,7 +1169,7 @@ function cardTurnSubscriber() {
     padding: 5px;
 }
 #cardTurnCardsList {
-    height: calc(100% - 120px);
+    height: calc(100% - 105px);
     overflow-y: scroll;
     scrollbar-width: none;
     /* background-color: rgba(0, 0, 0, 0.5); */
@@ -1089,6 +1291,48 @@ function cardTurnSubscriber() {
                 for (const h of hand) {
                     addHand(h);
                 }
+
+                // add p, input checkbox, label into #cardTurnCardsFilter
+                const filterSchema = cardFilter.schema;
+                for (let i=0; i<filterSchema.columns.length; ++i) {
+                    let columnDivInnerHTML = "";
+                    for (const area of filterSchema.columns[i]) {
+                        const areaText = filterSchema.areas[area].text;
+                        columnDivInnerHTML += `<p>${areaText}</p>`;
+                        const areaValues = filterSchema.areas[area].values;
+                        for (const value in areaValues) {
+                            const valueText = areaValues[value];
+                            columnDivInnerHTML += `
+                                <input type="checkbox" id="cardTurnFilterCheckbox_${area}_${value}" value="${area}_${value}">
+                                <label for="cardTurnFilterCheckbox_${area}_${value}">${valueText}</label><br>
+                            `;
+                        }
+                    }
+                    if (i === filterSchema.columns.length-1) {
+                        columnDivInnerHTML += "<button>Clear all</button>"
+                    }
+                    getE("cardTurnCardsFilter").children[i].innerHTML = columnDivInnerHTML;
+                }
+                getE("cardTurnCardsText").onclick = function() {
+                    const filterDom = getE("cardTurnCardsFilter");
+                    const txt = getE("cardTurnCardsText");
+                    if (filterDom.classList.contains("cardTurnCardsFilterClosed")) {
+                        filterDom.classList.remove("cardTurnCardsFilterClosed");
+                        txt.innerText = "Filter cards:";
+                    }
+                    else {
+                        filterDom.classList.add("cardTurnCardsFilterClosed");
+                        txt.innerText = "Filtered cards:";
+                    }
+                };
+                document.querySelectorAll("#cardTurnCardsFilter > div > input").forEach(elem => {
+                    elem.addEventListener("change", e => {
+                        cardFilter.update();
+                    });
+                });
+                document.querySelectorAll("#cardTurnCardsFilter > div > button")[0].onclick = function() {
+                    cardFilter.clear();
+                };
             }
         }
         catch (error) {

@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "version": "2022.03.31.01",
+    "version": "2022.04.19.07",
     "name": "Skyweaver Card Draw Turn Memorizer",
     "description": "This remembers which turn the opponent drew the cards by replacing/patching JS",
 

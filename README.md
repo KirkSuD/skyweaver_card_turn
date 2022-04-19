@@ -11,6 +11,7 @@ Browser extension supports **major browsers**, including **Chrome, Edge, Firefox
 <!-- ![Screenshot](https://i.imgur.com/Y48UsBB.png) -->
 [![Screenshot](https://i.imgur.com/OPiGp3A.png)](https://i.imgur.com/39WCBEW.mp4)
 [![Screenshot](https://i.imgur.com/443bnNP.png)](https://i.imgur.com/39WCBEW.mp4)
+[![Screenshot](https://i.imgur.com/Nl8VPLI.png)](https://i.imgur.com/39WCBEW.mp4)
 <!-- https://imgur.com/a/PfjH1bT -->
 
 ## Features
@@ -29,6 +30,7 @@ Browser extension supports **major browsers**, including **Chrome, Edge, Firefox
 - Mark special cards with an underline (cards not normally drawn from Deck/CardSelection)  
 - View opponent's & your prisms' card that are not present
 - Draggable beautiful UI box
+- Filter cards (click the "prism cards" text)
 - Save state in localStorage, so you can resume after refreshing the page
 
 ## Install
@@ -37,7 +39,7 @@ Browser extension supports **major browsers**, including **Chrome, Edge, Firefox
 
 The extension is not on Chrome/Firefox add-on store yet.
 
-1. Download [latest release/browser_extension_VERSION.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.04.14.10.zip)
+1. Download [latest release/browser_extension_VERSION.zip](https://github.com/KirkSuD/skyweaver_card_turn/raw/master/release/browser_extension_2022.04.19.07.zip)
 2. Extract the zip file to a folder
 3. Follow browser-specific steps below
 
@@ -84,7 +86,7 @@ Feel free to fork, create issue, create PR.
 To view the output of this script, search "Skyweaver card turn" in the developer tool's console.  
 To help debugging, when you find something wrong,  
     open browser developer tool by pressing F12 right after the game,  
-    type "JSON.stringify(window.skyweaverWorkerProxyStoreEvents)",  
+    type `JSON.stringify(window.skyweaverWorkerProxyStoreEvents)`,  
     then right click the output json message,
     click "copy object", save it as a text file,  
     which contains all game events, useful for debugging.
@@ -125,6 +127,12 @@ Now content script is also userscript.
 ### 2022.04.14.10
 
 Epic new features: remember how opponent got the cards, view opponent's & your prisms' cards.
+
+### 2022.04.19.07
+
+Fix bugs: toMulligan, hero broken image.  
+Better logging, better data export for debugging.  
+New feature: filter cards.
 
 ## Donation
 
