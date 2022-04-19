@@ -993,6 +993,7 @@ function cardTurnSubscriber() {
                 document.onmousemove = function(e) {
                     e = e || window.event;
                     e.preventDefault();
+                    document.body.style.cursor = "grab";
                     // const [dx, dy] = [e.clientX - x, e.clientY - y];
                     // [x, y] = [e.clientX, e.clientY];
 
@@ -1013,6 +1014,8 @@ function cardTurnSubscriber() {
                     // log.log("mouse up");
                     document.onmousemove = null;
                     document.onmouseup = null;
+                    // document.body.style.removeProperty("cursor");
+                    document.body.style.cursor = "default";
                     rootDivPos[0] = elem.style.left;
                     if (!viewingCards) {
                         rootDivPos[1] = elem.style.top;
@@ -1051,6 +1054,7 @@ function cardTurnSubscriber() {
         </div>
         <div id="cardTurnCardsFilter" class="cardTurnCardsFilterClosed">
             <input id="cardTurnCardsFilterSearch" placeholder="Search" autofocus>
+            <button id="cardTurnCardsFilterClear">X</button>
             <!-- the 2 columns filter box -->
             <div>
                 <!-- Content set in Javascript
@@ -1186,7 +1190,7 @@ function cardTurnSubscriber() {
 }
 #cardTurnCardsFilter {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     height: calc(100% - 105px);
     margin: 2px;
     margin-bottom: 10px;
@@ -1196,7 +1200,10 @@ function cardTurnSubscriber() {
     scrollbar-width: none;
 }
 #cardTurnCardsFilterSearch {
-    grid-column: 1 / -1;
+    grid-column: 1 / -2;
+}
+#cardTurnCardsFilter > div {
+    grid-column-end: span 4;
 }
 #cardTurnCardsFilter > div > p {
     margin: 5px;
@@ -1360,9 +1367,6 @@ function cardTurnSubscriber() {
                             `;
                         }
                     }
-                    if (i === filterSchema.columns.length-1) {
-                        columnDivInnerHTML += "<button>Clear all</button>"
-                    }
                     document.querySelectorAll("#cardTurnCardsFilter > div")[i].innerHTML = columnDivInnerHTML;
                 }
                 getE("cardTurnCardsText").onclick = function() {
@@ -1385,14 +1389,18 @@ function cardTurnSubscriber() {
                     // skyweaver webpage shortcut: a history d deck g graveyard
                     e.stopPropagation();
                 });
+                getE("cardTurnCardsFilterClear").onclick = function() {
+                    // keep search box text, but clear everything else
+                    const s = getE("cardTurnCardsFilterSearch").value;
+                    cardFilter.clear();
+                    getE("cardTurnCardsFilterSearch").value = s;
+                    cardFilter.update();
+                };
                 document.querySelectorAll("#cardTurnCardsFilter > div > input").forEach(elem => {
                     elem.addEventListener("change", e => {
                         cardFilter.update();
                     });
                 });
-                document.querySelectorAll("#cardTurnCardsFilter > div > button")[0].onclick = function() {
-                    cardFilter.clear();
-                };
             }
         }
         catch (error) {
