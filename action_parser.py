@@ -157,18 +157,24 @@ def get_children(actions):
     return res
 
 
-fnames = [
-    # "worker_proxy_store_events",
-    # "worker_proxy_store_events_22040814",
-    # "worker_proxy_store_events_22040815_mulligan",
-    # # # "worker_proxy_store_events_22040820_queue",
-    # "worker_proxy_store_events_22041100_card_4060",
-    # "worker_proxy_store_events_22041407_card_2059",
-    # "worker_proxy_store_events_22041408_card_3095",
-    # "worker_proxy_store_events_22041408_card_3095_2",
-    # "worker_proxy_store_events_22041819_very_long",
-    "worker_proxy_store_events_22041823"
-]
+# fnames = [
+#     # "worker_proxy_store_events",
+#     # "worker_proxy_store_events_22040814",
+#     # "worker_proxy_store_events_22040815_mulligan",
+#     # # # "worker_proxy_store_events_22040820_queue",
+#     # "worker_proxy_store_events_22041100_card_4060",
+#     # "worker_proxy_store_events_22041407_card_2059",
+#     # "worker_proxy_store_events_22041408_card_3095",
+#     # "worker_proxy_store_events_22041408_card_3095_2",
+#     # "worker_proxy_store_events_22041819_very_long",
+#     "worker_proxy_store_events_22041823"
+# ]
+
+import os
+from glob import glob
+fnames = [os.path.split(i)[1][:-5] for i in glob("event_data/worker_proxy_store_events*.json")]
+input(fnames)
+
 # children_graph = "event_data/children.png"
 # children_graph = "event_data/children.html"
 children_graph = None

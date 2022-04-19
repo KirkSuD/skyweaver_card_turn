@@ -675,7 +675,7 @@ function cardTurnSubscriber() {
                     },
                     triggers: {
                         text: "TRIGGERS",
-                        values: this.toCapitalizeObject("Play Summon Inspire Glory Sunset Sunrise Mulligan Draw Dust Death")
+                        values: this.toCapitalizeObject("Play Summon Inspire Glory Sunset Sunrise Mulligan Draw Dust Death Generic")
                     },
                     manaCost: {
                         text: "MANA COST",
@@ -685,7 +685,18 @@ function cardTurnSubscriber() {
             };
         }
         static extractCard(c, id) {
-            const triggers = [];
+            const triggers = new Set();
+            let textDescription = "";
+            c.effectTypes.forEach(e => {
+                // values of effectTypes: ["Generic", "Death", "Sunset", "Summon", "Glory", "Play", "Inspire", "Sunrise", "Summon& Death"]
+                if (e in this.schema.areas.triggers.values) {
+                    triggers.add(e);
+                }
+                else if (e === "Summon& Death") {
+                    triggers.add("Summon");
+                    triggers.add("Death");
+                }
+            });
             if ("parsedDescription" in c) {
                 // example card without description:
                 // https://assets.skyweaver.net/latest/full-cards/4x/13.png
@@ -708,10 +719,11 @@ function cardTurnSubscriber() {
                     if (!txt) {
                         return;
                     }
+                    textDescription += txt;
                     if (element.type === "bold") {
                         txt = this.capitalize(txt);
                         if (txt in this.schema.areas.triggers.values) {
-                            triggers.push(txt);
+                            triggers.add(txt);
                         }
                     }
                     else if (element.type === "trigger") {
@@ -722,25 +734,37 @@ function cardTurnSubscriber() {
                             txt = txt.slice(0, -1);
                         }
                         if (txt.startsWith("Inspire ")) {
-                            triggers.push("Inspire");
+                            triggers.add("Inspire");
                         }
                         else if (txt === "Summon & Death") {
-                            triggers.push("Summon");
-                            triggers.push("Death");
+                            triggers.add("Summon");
+                            triggers.add("Death");
                         }
                         else if (txt in this.schema.areas.triggers.values) {
-                            triggers.push(txt);
+                            triggers.add(txt);
                         }
                     }
                 });
             }
             return {
-                id: id, name: c.name,
+                id: id, name: c.name, textDescription: textDescription,
                 prism: c.prism, cardType: c.type, element: c.element,
-                traits: c.traits, triggers: triggers, manaCost: c.cost.toString()
+                traits: c.traits, triggers: [...triggers], manaCost: c.cost.toString()
             };
         }
+        static getAllCardText(card) {
+            const allCardText = [
+                card.id.toString(),
+                card.name.toLowerCase(),
+                card.textDescription.toLowerCase(),
+                card.cardType.toLowerCase()
+            ];
+            card.traits.forEach(t => allCardText.push(t.toLowerCase()));
+            card.triggers.forEach(t => allCardText.push(t.toLowerCase()));
+            return allCardText;
+        }
         static update() {
+            const searchStr = getE("cardTurnCardsFilterSearch").value.toLowerCase();
             const filters = {};
             document.querySelectorAll("#cardTurnCardsFilter > div > input").forEach(elem => {
                 if (elem.checked) {
@@ -772,13 +796,35 @@ function cardTurnSubscriber() {
                 }
                 delete filters[area];
             }
+            // filter cards
             const viewCards = [];
             cards.forEach((c, id) => {
                 const card = this.extractCard(c, id);
                 if (card.cardType === "Enchant" || !(card.prism in this.schema.areas.prism.values)) {
+                    // skip enchant cards, skip prism tut tok cards
+                    // tut: old or dev cards  tok: cards from other cards
                     return;
                 }
-                if (inCards.length > 0 && !inCards.includes(id)) {
+                if (searchStr.length > 0) {
+                    /* Note: Skyweaver's official library search itself is wierd & not prefect
+                    For example 1, card #2010 Hydrate is NOT in result when filter Spell + Water + Draw.
+                    Example 2, search "stealth", card #3032 Gus is in result because Songbird has Stealth;
+                    but card #1085 Flurry is not in result.
+                    */
+                    const allCardText = this.getAllCardText(card);
+                    if (c.attachedSpellID && cards.has(c.attachedSpellID)) {
+                        const attachedSpell = this.extractCard(cards.get(c.attachedSpellID), c.attachedSpellID);
+                        this.getAllCardText(attachedSpell).forEach(t => allCardText.push(t));
+                    }
+                    c.relatedCards.forEach(i => {
+                        i = i.toString();
+                        this.getAllCardText(this.extractCard(cards.get(i), i)).forEach(t => allCardText.push(t));
+                    });
+                    if (!allCardText.some(t => t.includes(searchStr))) {
+                        return;
+                    }
+                }
+                else if (inCards.length > 0 && !inCards.includes(id)) {
                     return;
                 }
                 else if (outCards.includes(id)) {
@@ -797,7 +843,7 @@ function cardTurnSubscriber() {
                 viewCards.push(card);
             });
 
-            // filter & sort cards
+            // count & sort cards
             const elementCount = {}, typeCount = {};
             viewCards.forEach((c, id) => {
                 elementCount[c.element] = (elementCount[c.element] ?? 0) + 1;
@@ -839,12 +885,13 @@ function cardTurnSubscriber() {
             getE("cardTurnCardsList").innerHTML = "";
             for (const c of viewCards) {
                 const cardDiv = document.createElement("div");
+                const prependName = (c.name.toLowerCase()===searchStr) ? `#${c.id} ` : "";
                 cardDiv.innerHTML = `
                     <div>${c.manaCost}</div>
                     <div class="cardTurnImgContainer">
                         <img src="${icons.type[c.cardType.toLowerCase()]}">
                     </div>
-                    <div>${c.name}</div>
+                    <div>${prependName}${c.name}</div>
                     <div class="cardTurnImgContainer">
                         <img src="${icons.element[c.element]}">
                     </div>`;
@@ -857,6 +904,7 @@ function cardTurnSubscriber() {
             }
         }
         static clear() {
+            getE("cardTurnCardsFilterSearch").value = "";
             document.querySelectorAll("#cardTurnCardsFilter > div > input").forEach(elem => {
                 elem.checked = false;
             });
@@ -1002,6 +1050,7 @@ function cardTurnSubscriber() {
             <!-- Cards ∉ your deck: -->
         </div>
         <div id="cardTurnCardsFilter" class="cardTurnCardsFilterClosed">
+            <input id="cardTurnCardsFilterSearch" placeholder="Search" autofocus>
             <!-- the 2 columns filter box -->
             <div>
                 <!-- Content set in Javascript
@@ -1145,6 +1194,9 @@ function cardTurnSubscriber() {
     border: 1px solid rgba(146, 104, 230, 0.8);
     overflow-y: scroll;
     scrollbar-width: none;
+}
+#cardTurnCardsFilterSearch {
+    grid-column: 1 / -1;
 }
 #cardTurnCardsFilter > div > p {
     margin: 5px;
@@ -1311,7 +1363,7 @@ function cardTurnSubscriber() {
                     if (i === filterSchema.columns.length-1) {
                         columnDivInnerHTML += "<button>Clear all</button>"
                     }
-                    getE("cardTurnCardsFilter").children[i].innerHTML = columnDivInnerHTML;
+                    document.querySelectorAll("#cardTurnCardsFilter > div")[i].innerHTML = columnDivInnerHTML;
                 }
                 getE("cardTurnCardsText").onclick = function() {
                     const filterDom = getE("cardTurnCardsFilter");
@@ -1319,12 +1371,20 @@ function cardTurnSubscriber() {
                     if (filterDom.classList.contains("cardTurnCardsFilterClosed")) {
                         filterDom.classList.remove("cardTurnCardsFilterClosed");
                         txt.innerText = "Filter cards:";
+                        getE("cardTurnCardsFilterSearch").focus();
                     }
                     else {
                         filterDom.classList.add("cardTurnCardsFilterClosed");
                         txt.innerText = "Filtered cards:";
                     }
                 };
+                getE("cardTurnCardsFilterSearch").addEventListener("input", e => {
+                    cardFilter.update();
+                });
+                getE("cardTurnCardsFilterSearch").addEventListener("keydown", e => {
+                    // skyweaver webpage shortcut: a history d deck g graveyard
+                    e.stopPropagation();
+                });
                 document.querySelectorAll("#cardTurnCardsFilter > div > input").forEach(elem => {
                     elem.addEventListener("change", e => {
                         cardFilter.update();
