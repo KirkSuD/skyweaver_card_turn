@@ -114,12 +114,12 @@ def parse_action(reader, until=None):
                 "toIndex": to_location[1],
                 "toPublic": to_location[0].get("public")
             }
-            # parent_items.append({
-            #     "type": evt, "content": content})
-            if content["fromZone"] == "Hand" and content["toZone"] != "Hand":
-                parent_items.append({"type": "Out", "content": content})
-            elif content["fromZone"] != "Hand" and content["toZone"] == "Hand":
-                parent_items.append({"type": "In", "content": content})
+            parent_items.append({
+                "type": evt, "content": content})
+            # if content["fromZone"] == "Hand" and content["toZone"] != "Hand":
+            #     parent_items.append({"type": "Out", "content": content})
+            # elif content["fromZone"] != "Hand" and content["toZone"] == "Hand":
+            #     parent_items.append({"type": "In", "content": content})
     if until:
         return parent_items, parent_new_content
     else:

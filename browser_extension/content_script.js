@@ -113,9 +113,9 @@ function cardTurnSubscriber() {
             console.warn(this.prependMessage, ...args);
         }
     }
-    let turn = 0, hand = [], rootDivPos = ["180px", "10%"],
+    let turn = 0, hand = [], rootDivPos = ["180px", "10%"], clickedDonate = false,
         noerror = true, enemy = null, rootDiv = null, viewingCards = null, showingHand = null;
-    const cards = n.a, playerOpponentZones = i(44).b;
+    const cards = n.a, playerOpponentZones = i(45).b;
     window.playerOpponentZones = playerOpponentZones;
     window.cards = cards;
     window.skyweaverWorkerProxyStoreEvents = [];
@@ -143,10 +143,10 @@ function cardTurnSubscriber() {
     } catch (error) {
         savedHand = null;
     }
-    const savedDataKeys = "turn hand rootDivPos";
+    const savedDataKeys = "turn hand rootDivPos clickedDonate";
     if (savedHand && savedDataKeys.split(" ").every(k => k in savedHand)) {
         log.log("load state from localStorage:", savedHand);
-        ({turn, hand, rootDivPos} = savedHand);
+        ({turn, hand, rootDivPos, clickedDonate} = savedHand);
     }
     function deepCopy(x) {
         return JSON.parse(JSON.stringify(x));
@@ -644,7 +644,7 @@ function cardTurnSubscriber() {
             return res
         }
         static get zones() {
-            return this.toCapitalizeObject("Deck Hand Field Graveyard");
+            return this.toCapitalizeObject("Deck Hand Field Graveyard Dust");
         }
         static get schema() {
             return {
@@ -975,11 +975,28 @@ function cardTurnSubscriber() {
         }
     }
 
+    function playerWon() {
+        function findHeroHealth(zone) {
+            let res = null;
+            zone.items.forEach(item => {
+                if (item.has("cardInstance")) {
+                    const c = item.get("cardInstance");
+                    if (c.base === "Hero") {
+                        res = c.state.instance.health;
+                    }
+                }
+            });
+            return res;
+        }
+        return findHeroHealth(playerOpponentZones.Player_Field) > 0 &&
+            findHeroHealth(playerOpponentZones.Opponent_Field) <= 0;
+    }
+
     const actParser = new myActionParser(actionHandler);
     function workerProxyStoreSubscriber(ev) {
         function saveLocalStorage() {
             localStorage.setItem(localStorageKey, JSON.stringify({
-                turn, hand, rootDivPos
+                turn, hand, rootDivPos, clickedDonate
             }));
         }
         function draggable(elem) {
@@ -1040,14 +1057,25 @@ function cardTurnSubscriber() {
             window.skyweaverWorkerProxyStoreEvents[window.skyweaverWorkerProxyStoreEvents.length-1][2] = eventHandleResult;
             saveLocalStorage();
 
+            if (!clickedDonate && playerWon()) {
+                log.log("Won, displaying donation ad.")
+                getE("cardTurnTurnText").innerHTML = "You won! Click to donate?";
+                getE("cardTurnTurnText").onclick = function() {
+                    clickedDonate = true;
+                    saveLocalStorage();
+                    window.open("https://github.com/KirkSuD/skyweaver_card_turn#donation", "_blank");
+                    getE("cardTurnTurnText").innerHTML = "Thanks! Have fun.";
+                }
+            }
+
             if (rootDiv === null) {
                 const rootDivHTML = `
 <div id="cardTurnRootDiv" class="cardTurnCardsClosed">
     <p id="cardTurnTurnText">
         <!-- <span>11</span> -->
     </p>
-    <div id="cardTurnEnemyBtn" title="View enemy's not in graveyard prism cards">+</div>
-    <div id="cardTurnPlayerBtn" title="View your not in deck prism cards">+</div>
+    <div id="cardTurnEnemyBtn" title="View enemy's other prism cards">+</div>
+    <div id="cardTurnPlayerBtn" title="View your other prism cards">+</div>
     <div id="cardTurnCardsRoot">
         <div id="cardTurnCardsText">
             <!-- Cards ∉ your deck: -->

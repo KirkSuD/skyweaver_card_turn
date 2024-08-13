@@ -14,6 +14,14 @@ Browser extension supports **major browsers**, including **Chrome, Edge, Firefox
 [![Screenshot](https://i.imgur.com/Nl8VPLI.png)](https://i.imgur.com/39WCBEW.mp4)
 <!-- https://imgur.com/a/PfjH1bT -->
 
+## Archived Project
+
+This project is archived.  
+If you're interested, you can write one by yourself.  
+If you think this code useful, as long as you'll not use it to make money, take it.  
+(But I guess this is useless. The code is twisted, and the Manifest V3 stuff,  
+and Skyweaver has definitely changed a lot. This is more like a proof of concept.)
+
 ## Features
 
 - Remember the opponent got the cards...  
@@ -133,28 +141,3 @@ Epic new features: remember how opponent got the cards, view opponent's & your p
 Fix bugs: toMulligan, hero broken image.  
 Better logging, better data export for debugging.  
 New feature: filter cards.
-
-## Donation
-
-Winning using this userscript? Consider buying me a coffee!  
-My crypto addresses:
-```
-Skyweaver Sequence wallet
-      0xB77702eF2213e0472f8071c6209CbD10324b3c21
-BTC   bc1qttretrlxjfv2363zdg7xvthyvrstsru0mhangk
-ETH AVAX MATIC FTT GRT CAKE
-      0x760a6c97eAcABFE46D6c602a371f42099d6a8576
-BNB   bnb1pqzkpxl5s5wc3s7h2hga5hq8sn98sz4a0xefec
-LUNA  terra1upxh8ufp3carg8z8nc39sdrsrn02cde8hxxlz9
-SOL   2V9Ux48XttpH3r4ZTg3rxRpd5fmLiYz2EAq2eCSNifCY
-DOT   14j8gPesPyxmw4eC1rBpUqgydT3xw7KJSo2dJ6VuigG9J4E9
-DOGE  DA19CxjfTkURNVxs5fNeZGNdsUPsStax5E
-LTC   ltc1qlgqh5aqemjazsfnq7zxayg6y75aqv7twl2r56d
-ATOM  cosmos1gaqjnqrz9aae2w03dw3zr3xr8un2tnpnv075rf
-THETA 0xa3415F2e117A256c3371B7ee4a6340862A1294E9
-DASH  XgrxBD5KWjnYaScpNd6u4fGxiYfc9u2uBN
-DGB   dgb1q65h5v9990mrx2eutyu4xud23qlty6e5u66xzv9
-XNO   nano_1m5kn3h34gibzoz54g9yie5je5c6psiofiwr4tcx3um8up3abaz31z33tqo4
-TT    0x08AF0f949a8Af3027177C8b42B91d85f951a487B
-LBC   bZqCwFPuGDaQfH5W1QYy19Fs4uGF83UvgC
-```

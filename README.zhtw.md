@@ -14,6 +14,14 @@
 [![截圖](https://i.imgur.com/Nl8VPLI.png)](https://i.imgur.com/39WCBEW.mp4)
 <!-- https://imgur.com/a/PfjH1bT -->
 
+## 已封存的專案
+
+此專案已封存。  
+有興趣的話，可以自己寫一個。  
+如果你覺得這個 code 有用，只要是非營利的話，就拿去吧。  
+(但我猜這完全沒屁用。這 code 很亂，而且有 Manifest V3 的問題，  
+Skyweaver 也一定已經變很多了。這比較像概念驗證而已。)
+
 ## 功能
 
 - 顯示對手拿到牌的資訊，包括...  
@@ -129,28 +137,3 @@ Firefox的背景腳本無作用，內容腳本會阻擋原腳本及修改腳本�
 修正bug: toMulligan、hero破圖。  
 更好的 logging、更好的debug用資料匯出。  
 新功能：過濾卡片。
-
-## 贊助
-
-用這個贏了？不如請我一杯咖啡吧！  
-我的加密貨幣地址：
-```
-Skyweaver Sequence wallet
-      0xB77702eF2213e0472f8071c6209CbD10324b3c21
-BTC   bc1qttretrlxjfv2363zdg7xvthyvrstsru0mhangk
-ETH AVAX MATIC FTT GRT CAKE
-      0x760a6c97eAcABFE46D6c602a371f42099d6a8576
-BNB   bnb1pqzkpxl5s5wc3s7h2hga5hq8sn98sz4a0xefec
-LUNA  terra1upxh8ufp3carg8z8nc39sdrsrn02cde8hxxlz9
-SOL   2V9Ux48XttpH3r4ZTg3rxRpd5fmLiYz2EAq2eCSNifCY
-DOT   14j8gPesPyxmw4eC1rBpUqgydT3xw7KJSo2dJ6VuigG9J4E9
-DOGE  DA19CxjfTkURNVxs5fNeZGNdsUPsStax5E
-LTC   ltc1qlgqh5aqemjazsfnq7zxayg6y75aqv7twl2r56d
-ATOM  cosmos1gaqjnqrz9aae2w03dw3zr3xr8un2tnpnv075rf
-THETA 0xa3415F2e117A256c3371B7ee4a6340862A1294E9
-DASH  XgrxBD5KWjnYaScpNd6u4fGxiYfc9u2uBN
-DGB   dgb1q65h5v9990mrx2eutyu4xud23qlty6e5u66xzv9
-XNO   nano_1m5kn3h34gibzoz54g9yie5je5c6psiofiwr4tcx3um8up3abaz31z33tqo4
-TT    0x08AF0f949a8Af3027177C8b42B91d85f951a487B
-LBC   bZqCwFPuGDaQfH5W1QYy19Fs4uGF83UvgC
-```
